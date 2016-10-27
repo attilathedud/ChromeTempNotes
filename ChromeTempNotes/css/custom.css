@@ -1,3 +1,12 @@
+.note-div-parent {
+    position: absolute;
+    padding: 0.5em; 
+    z-index: 2147483647; /*highest value allowed in Chrome */
+    border-radius: 4px;
+    box-shadow: rgb(136, 136, 136) 5px 5px 10px;
+    font: 12px helvetica;
+}
+
 .note-div { 
     width: 200px; 
     height: 100px; 
@@ -5,11 +14,6 @@
     padding-top: 15px;
     text-align: left;
     overflow: auto;
-    position: absolute;
-    box-shadow: rgb(136, 136, 136) 5px 5px 10px;
-    border-radius: 4px;
-    z-index: 2147483647; /*highest value allowed in Chrome */
-    font: 12px helvetica;
 }
 
 .note-div-dark {
