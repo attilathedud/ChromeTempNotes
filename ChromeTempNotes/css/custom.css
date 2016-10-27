@@ -10,6 +10,8 @@
     position: absolute;
     box-shadow: rgb(136, 136, 136) 5px 5px 10px;
     border-radius: 4px;
+    z-index: 2147483647; /*highest value allowed in Chrome */
+    font: 12px helvetica;
 }
 
 .close:before {
