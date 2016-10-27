@@ -3,15 +3,23 @@
     height: 100px; 
     padding: 0.5em; 
     padding-top: 15px;
-    background: rgba( 0, 0, 0, .5 );
     text-align: left;
-    color: rgb( 255, 255, 255 );
     overflow: auto;
     position: absolute;
     box-shadow: rgb(136, 136, 136) 5px 5px 10px;
     border-radius: 4px;
     z-index: 2147483647; /*highest value allowed in Chrome */
     font: 12px helvetica;
+}
+
+.note-div-dark {
+    background: rgba( 0, 0, 0, .5 );
+    color: rgb( 255, 255, 255 );
+}
+
+.note-div-light {
+    background: rgba( 255, 255, 255, .5 );
+    color: rgb( 0, 0, 0 );
 }
 
 .close:before {
@@ -22,5 +30,16 @@
     position: absolute;
     top: 5px;
     right: 10px;
+    cursor: pointer;
+}
+
+.toggle-color:before {
+    content: '🖌'
+}
+
+.toggle-color {
+    position: absolute;
+    top: 2px;
+    right: 25px;
     cursor: pointer;
 }
