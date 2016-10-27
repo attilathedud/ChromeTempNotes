@@ -1,0 +1,24 @@
+.note-div { 
+    width: 200px; 
+    height: 100px; 
+    padding: 0.5em; 
+    padding-top: 15px;
+    background: rgba( 0, 0, 0, .5 );
+    text-align: left;
+    color: rgb( 255, 255, 255 );
+    overflow: auto;
+    position: absolute;
+    box-shadow: rgb(136, 136, 136) 5px 5px 10px;
+    border-radius: 4px;
+}
+
+.close:before {
+    content: '✕';
+}
+
+.close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+}
