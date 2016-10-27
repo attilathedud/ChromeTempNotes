@@ -1,7 +1,7 @@
 .note-div-parent {
     position: absolute;
     padding: 0.5em; 
-    z-index: 2147483647; /*highest value allowed in Chrome */
+    z-index: 2147483647; /* Highest value allowed in Chrome. */
     border-radius: 4px;
     box-shadow: rgb(136, 136, 136) 5px 5px 10px;
     font: 12px helvetica;
@@ -17,31 +17,31 @@
 }
 
 .note-div-dark {
-    background: rgba( 0, 0, 0, .5 );
+    background: rgba( 0, 0, 0, .7 );
     color: rgb( 255, 255, 255 );
 }
 
 .note-div-light {
-    background: rgba( 255, 255, 255, .5 );
+    background: rgba( 255, 255, 255, .7 );
     color: rgb( 0, 0, 0 );
 }
 
-.close:before {
+.close-note:before {
     content: '✕';
 }
 
-.close {
+.close-note {
     position: absolute;
     top: 5px;
     right: 10px;
     cursor: pointer;
 }
 
-.toggle-color:before {
+.toggle-color-note:before {
     content: '🖌'
 }
 
-.toggle-color {
+.toggle-color-note {
     position: absolute;
     top: 2px;
     right: 25px;
