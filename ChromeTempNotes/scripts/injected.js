@@ -19,6 +19,9 @@ $( window ).contextmenu( function( e ) {
 function set_selection( div, line, index ) {
     var range = document.createRange( );
 
+    if( div.childNodes.length == 0 )
+        return;
+
     if( div.childNodes[ line ].childNodes.length == 0 ) {
         range.setStart( div.childNodes[ line ], index );
     }
@@ -139,8 +142,25 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
                         var current_pos = selection.anchorOffset;
                         var $current_text = $( this.childNodes[ $current_line.val( ) ] );
 
-                        //$current_text.text( $current_text.text().substring( 0, current_pos - 1 ) + $current_text.text( ).substring( current_pos ) );
-                        set_selection( this, $current_line.val( ), current_pos - 1 < 0 ? 0 : current_pos - 1 );
+                        if( this.childNodes.length == 0 || ( current_pos == 0 && $current_line.val( ) == 0 ) ) 
+                            break;
+
+                        if( this.childNodes[ $current_line.val( ) ].childNodes.length == 0 ) {
+                            $current_text.parent( ).text( $current_text.parent( ).text().substring( 0, current_pos - 1 ) + $current_text.parent( ).text( ).substring( current_pos ) );
+                        }
+                        else {
+                            $current_text.text( $current_text.text().substring( 0, current_pos - 1 ) + $current_text.text( ).substring( current_pos ) );
+                        }
+
+                        if( current_pos > 0 && !( current_pos == 1 && $( this.childNodes[ $current_line.val( ) ] ).text( ).length == 0) ) {
+                            set_selection( this, $current_line.val( ), current_pos - 1 < 0 ? 0 : current_pos - 1 );
+                        }
+                        else {
+                            if( $current_line.val( ) > 0 ) {
+                                $current_line.val( parseInt( $current_line.val( ) ) - 1 );
+                                set_selection( this, $current_line.val( ), $( this.childNodes[ $current_line.val( ) ] ).text( ).length  );
+                            }
+                        }
 
                         break;
                     case 13:            //enter
@@ -150,7 +170,6 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
                         if( selection.anchorOffset > 0 ) {
                             set_selection( this, $current_line.val( ), selection.anchorOffset - 1 );
                         }
-
                         break;
                     case 38:            //up
                         if( $current_line.val( ) > 0 ) {
@@ -162,7 +181,6 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
                         if( selection.anchorNode.wholeText != undefined && selection.anchorOffset < selection.anchorNode.wholeText.length ) {
                             set_selection( this, $current_line.val( ), selection.anchorOffset + 1 );
                         }
-
                         break;
                     case 40:            //down
                         if( $current_line.val( ) < this.childNodes.length - 1 ) {
