@@ -143,9 +143,8 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
                     case 38:            //up
                         if( $current_line.val( ) > 0 ) {
                             $current_line.val( parseInt( $current_line.val( ) ) - 1 );
+                            set_selection( this, $current_line.val( ), 0 );
                         }
-
-                        set_selection( this, $current_line.val( ), 0 );
                         break;
                     case 39:            //right
                         if( window.getSelection( ).anchorOffset < window.getSelection( ).anchorNode.wholeText.length ) {
@@ -156,9 +155,8 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
                     case 40:            //down
                         if( $current_line.val( ) < this.childNodes.length - 1 ) {
                             $current_line.val( parseInt( $current_line.val( ) ) + 1 );
+                            set_selection( this, $current_line.val( ), 0 );
                         }
-
-                        set_selection( this, $current_line.val( ), 0 );
                         break;
                 }
             }); 
