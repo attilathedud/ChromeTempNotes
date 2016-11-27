@@ -177,15 +177,19 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
                             $current_text.text( $current_text.text().substring( 0, current_pos - 1 ) + $current_text.text( ).substring( current_pos ) );
                         }
 
+                        if( $current_text.text().length == 0 ) {
+                            $current_text.remove( );
+                            if( $current_line.val( ) > 0 ) {
+                                $current_line.val( parseInt( $current_line.val( ) ) - 1 );
+                            }
+                        }
+
                         //If we still have text, move one left, otherwise, jump up to the previous line.
                         if( current_pos > 0 && !( current_pos == 1 && $( this.childNodes[ $current_line.val( ) ] ).text( ).length == 0) ) {
                             set_selection( this, $current_line.val( ), current_pos - 1 < 0 ? 0 : current_pos - 1 );
                         }
                         else {
-                            if( $current_line.val( ) > 0 ) {
-                                $current_line.val( parseInt( $current_line.val( ) ) - 1 );
-                                set_selection( this, $current_line.val( ), $( this.childNodes[ $current_line.val( ) ] ).text( ).length  );
-                            }
+                            set_selection( this, $current_line.val( ), $( this.childNodes[ $current_line.val( ) ] ).text( ).length  );
                         }
 
                         break;
