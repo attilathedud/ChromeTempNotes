@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var note_id = 0;
 
@@ -16,12 +16,20 @@ $( window ).contextmenu( function( e ) {
     last_click_pos.y = e.pageY;
 });
 
+/*!
+* For a contenteditable div, set the cursor to the given index position on the given line number.
+*
+* div: A document selector to the contenteditable div. Not a jQuery selector.
+* line: The line to place the cursor on. 0-based.
+* index: The index on the line to place the cursor at. 0-based.
+*/
 function set_selection( div, line, index ) {
     var range = document.createRange( );
 
     if( div.childNodes.length == 0 )
         return;
 
+    //If we are at the top element of the contenteditable, it needs to be treated as text and not a div.
     if( div.childNodes[ line ].childNodes.length == 0 ) {
         range.setStart( div.childNodes[ line ], index );
     }
@@ -114,14 +122,22 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
             $( this ).parents( '.note-div-parent' ).toggleClass( 'note-div-dark note-div-light' );
         });
 
+        /*!
+        * There was an attempt to add a scroll handler to check for the pdf scrolling.
+        * This was an abysmal failure.
+        */
+
         $( '#note-' + note_id ).on( 'focus', function( ) {
-            //if pdf, change currnet line
+            /*!
+            * If we are viewing a pdf, set the current_line element to the max length, since focusing
+            * places our cursor there.
+            */
             if( pdf_embedded( ) ) {
                 var $current_line = $( this ).parent( ).find( '#current_line' );
                 $current_line.val( this.childNodes.length - 1 > 0 ? this.childNodes.length - 1 : 0 );
             }
 
-            //set cursor to end of selection
+            //Set the cursor to the end of the selection.
             var range = document.createRange( );
             range.selectNodeContents( this );
             range.collapse( false);
@@ -131,7 +147,13 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
             selection.addRange( range );
         });
 
-        //if we have a pdf active we need to make some hacks
+        /*!
+        * By default, both pdf.js and Adobe's embedded pdf reader capture keypresses 
+        * (mainly to prevent accidentally navigation). Because Chrome treats embedded elements
+        * with a higher precedence than anything else. As a result, keypresses are captured 
+        * by the pdf and never passed on to our contenteditable. To resolve this, we need to
+        * recreate basic navigation functionality. 
+        */
         if( pdf_embedded( ) ) {
             $( '#note-' + note_id ).on( 'keydown', function( e ) {
                 var $current_line = $( this ).parent( ).find( '#current_line' );
@@ -142,9 +164,12 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
                         var current_pos = selection.anchorOffset;
                         var $current_text = $( this.childNodes[ $current_line.val( ) ] );
 
+                        //If there is nothing, prevent the deletion of the contenteditable object.
                         if( this.childNodes.length == 0 || ( current_pos == 0 && $current_line.val( ) == 0 ) ) 
                             break;
 
+                        //The first element of contenteditable's are treated as text nodes,
+                        //with future elements being wrapped divs.
                         if( this.childNodes[ $current_line.val( ) ].childNodes.length == 0 ) {
                             $current_text.parent( ).text( $current_text.parent( ).text().substring( 0, current_pos - 1 ) + $current_text.parent( ).text( ).substring( current_pos ) );
                         }
@@ -152,6 +177,7 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
                             $current_text.text( $current_text.text().substring( 0, current_pos - 1 ) + $current_text.text( ).substring( current_pos ) );
                         }
 
+                        //If we still have text, move one left, otherwise, jump up to the previous line.
                         if( current_pos > 0 && !( current_pos == 1 && $( this.childNodes[ $current_line.val( ) ] ).text( ).length == 0) ) {
                             set_selection( this, $current_line.val( ), current_pos - 1 < 0 ? 0 : current_pos - 1 );
                         }
