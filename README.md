@@ -11,4 +11,8 @@ Ever have a short idea that you want to jot down on a page? Want to work on shor
 
 Simply right-click anywhere on a page to bring up the context-menu and then choose the "Temp Note" entry. A small, draggable, box will pop up that you can record your notes in. 
 
+### v1.0.1 Changelog
+- Fixed a bug where notes would not position correctly on short html documents.
+- Fixed a bug in pdfs where notes could not be edited.
+
 ![Application Main Screen 2](/promos/promo_2.png?raw=true "Application Main Screen 2")

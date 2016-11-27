@@ -149,7 +149,7 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
 
         /*!
         * By default, both pdf.js and Adobe's embedded pdf reader capture keypresses 
-        * (mainly to prevent accidentally navigation). Because Chrome treats embedded elements
+        * (mainly to prevent accidentally navigation). Chrome treats embedded elements
         * with a higher precedence than anything else. As a result, keypresses are captured 
         * by the pdf and never passed on to our contenteditable. To resolve this, we need to
         * recreate basic navigation functionality. 
