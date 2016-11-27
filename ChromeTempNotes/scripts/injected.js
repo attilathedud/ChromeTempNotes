@@ -1,3 +1,5 @@
+'use strict';
+
 var note_id = 0;
 
 var last_click_pos = {
@@ -13,6 +15,26 @@ $( 'body' ).contextmenu( function( e ) {
     last_click_pos.x = e.pageX;
     last_click_pos.y = e.pageY;
 });
+
+function set_selection( div, line, index ) {
+    var range = document.createRange( );
+
+    if( div.childNodes[ line ].childNodes.length == 0 ) {
+        range.setStart( div.childNodes[ line ], index );
+    }
+    else {
+        range.setStart( div.childNodes[ line ].childNodes[ 0 ], index );
+    }
+    range.collapse( true );
+
+    var selection = window.getSelection( );
+    selection.removeAllRanges( );
+    selection.addRange( range );
+}
+
+function pdf_embedded( ) {
+    return $('embed[type="application/pdf"]').length > 0;
+}
 
 chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
     if ( message.function == "context_menu_clicked" ) {
@@ -55,6 +77,14 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
             'contenteditable' : 'false'
         }).appendTo( '#note-parent-' + note_id );
 
+        if( pdf_embedded( ) ) {
+            $( '<input/>', {
+                'id' : 'current_line',
+                'type': 'hidden',
+                'value' : '0'
+            }).appendTo( '#note-parent-' + note_id );
+        }
+
         $( '#note-parent-' + note_id ).draggable( );
         $( '#note-' + note_id ).focus( );
 
@@ -70,26 +100,69 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
             $( this ).parents( '.note-div-parent' ).toggleClass( 'note-div-dark note-div-light' );
         });
 
-        /*!
-        * Due to a quirk in Chrome, for contenteditable divs the focus event fires 
-        * before the native browser selection takes place.
-        * It's also ridiculously retarded to place the cursor at the end of active text.
-        * This is a hack described here:
-        * https://stackoverflow.com/questions/2871081/jquery-setting-cursor-position-in-contenteditable-div/2948573#2948573
-        */
-        var div = document.getElementById( 'note-' + note_id );
-
         $( '#note-' + note_id ).on( 'focus', function( ) {
-            window.setTimeout( function( ) {
-                var range = document.createRange( );
-                range.selectNodeContents( div );
-                range.collapse( false) ;
+            //if pdf, change currnet line
+            if( pdf_embedded( ) ) {
+                var $current_line = $( this ).parent( ).find( '#current_line' );
+                $current_line.val( this.childNodes.length - 1 > 0 ? this.childNodes.length - 1 : 0 );
+            }
 
-                var selection = window.getSelection( );
-                selection.removeAllRanges( );
-                selection.addRange( range );
-            }, 1 );
+            //set cursor to end of selection
+            var range = document.createRange( );
+            range.selectNodeContents( this );
+            range.collapse( false);
+
+            var selection = window.getSelection( );
+            selection.removeAllRanges( );
+            selection.addRange( range );
         });
+
+        //if we have a pdf active we need to make some hacks
+        if( pdf_embedded( ) ) {
+            $( '#note-' + note_id ).on( 'keydown', function( e ) {
+                var $current_line = $( this ).parent( ).find( '#current_line' );
+
+                switch( e.which ) {
+                    case 8:             //backspace
+                        var current_pos = window.getSelection( ).anchorOffset;
+                        var $current_text = $( this.childNodes[ $current_line.val( ) ] );
+
+                        //$current_text.text( $current_text.text().substring( 0, current_pos - 1 ) + $current_text.text( ).substring( current_pos ) );
+                        set_selection( this, $current_line.val( ), current_pos - 1 < 0 ? 0 : current_pos - 1 );
+
+                        break;
+                    case 13:            //enter
+                        $current_line.val( parseInt( $current_line.val( ) ) + 1 );
+                        break;
+                    case 37:            //left
+                        if( window.getSelection( ).anchorOffset > 0 ) {
+                            set_selection( this, $current_line.val( ), window.getSelection( ).anchorOffset - 1 );
+                        }
+
+                        break;
+                    case 38:            //up
+                        if( $current_line.val( ) > 0 ) {
+                            $current_line.val( parseInt( $current_line.val( ) ) - 1 );
+                        }
+
+                        set_selection( this, $current_line.val( ), 0 );
+                        break;
+                    case 39:            //right
+                        if( window.getSelection( ).anchorOffset < window.getSelection( ).anchorNode.wholeText.length ) {
+                            set_selection( this, $current_line.val( ), window.getSelection( ).anchorOffset + 1 );
+                        }
+
+                        break;
+                    case 40:            //down
+                        if( $current_line.val( ) < this.childNodes.length - 1 ) {
+                            $current_line.val( parseInt( $current_line.val( ) ) + 1 );
+                        }
+
+                        set_selection( this, $current_line.val( ), 0 );
+                        break;
+                }
+            }); 
+        }
 
         note_id++;
     }
