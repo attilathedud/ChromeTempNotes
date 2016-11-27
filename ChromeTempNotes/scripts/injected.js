@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 var note_id = 0;
 
@@ -32,6 +32,10 @@ function set_selection( div, line, index ) {
     selection.addRange( range );
 }
 
+/*!
+* Checks for the existance of an embedded pdf that is being rendered via Chrome's 
+* native pdf reader or Adobe.
+*/
 function pdf_embedded( ) {
     return $('embed[type="application/pdf"]').length > 0;
 }
@@ -77,6 +81,10 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
             'contenteditable' : 'false'
         }).appendTo( '#note-parent-' + note_id );
 
+        /*!
+        * If we are creating a note for a pdf, we need to render an extra hidden
+        * input that will keep track of the current line we are navigating on.
+        */
         if( pdf_embedded( ) ) {
             $( '<input/>', {
                 'id' : 'current_line',
@@ -85,6 +93,9 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
             }).appendTo( '#note-parent-' + note_id );
         }
 
+        /*!
+        * Event handlers
+        */
         $( '#note-parent-' + note_id ).draggable( );
         $( '#note-' + note_id ).focus( );
 
@@ -121,10 +132,11 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
         if( pdf_embedded( ) ) {
             $( '#note-' + note_id ).on( 'keydown', function( e ) {
                 var $current_line = $( this ).parent( ).find( '#current_line' );
+                var selection = window.getSelection( );
 
                 switch( e.which ) {
                     case 8:             //backspace
-                        var current_pos = window.getSelection( ).anchorOffset;
+                        var current_pos = selection.anchorOffset;
                         var $current_text = $( this.childNodes[ $current_line.val( ) ] );
 
                         //$current_text.text( $current_text.text().substring( 0, current_pos - 1 ) + $current_text.text( ).substring( current_pos ) );
@@ -135,8 +147,8 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
                         $current_line.val( parseInt( $current_line.val( ) ) + 1 );
                         break;
                     case 37:            //left
-                        if( window.getSelection( ).anchorOffset > 0 ) {
-                            set_selection( this, $current_line.val( ), window.getSelection( ).anchorOffset - 1 );
+                        if( selection.anchorOffset > 0 ) {
+                            set_selection( this, $current_line.val( ), selection.anchorOffset - 1 );
                         }
 
                         break;
@@ -147,8 +159,8 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
                         }
                         break;
                     case 39:            //right
-                        if( window.getSelection( ).anchorOffset < window.getSelection( ).anchorNode.wholeText.length ) {
-                            set_selection( this, $current_line.val( ), window.getSelection( ).anchorOffset + 1 );
+                        if( selection.anchorNode.wholeText != undefined && selection.anchorOffset < selection.anchorNode.wholeText.length ) {
+                            set_selection( this, $current_line.val( ), selection.anchorOffset + 1 );
                         }
 
                         break;
