@@ -11,7 +11,7 @@ var last_click_pos = {
 * Since the contextmenu handler is attached on the background page,
 * we need to locally store the last right click.
 */
-$( 'body' ).contextmenu( function( e ) {
+$( window ).contextmenu( function( e ) {
     last_click_pos.x = e.pageX;
     last_click_pos.y = e.pageY;
 });
