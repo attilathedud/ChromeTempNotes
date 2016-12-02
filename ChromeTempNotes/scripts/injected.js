@@ -7,14 +7,7 @@ var last_click_pos = {
     "y" : 0
 }
 
-/*!
-* Since the contextmenu handler is attached on the background page,
-* we need to locally store the last right click.
-*/
-$( window ).contextmenu( function( e ) {
-    last_click_pos.x = e.pageX;
-    last_click_pos.y = e.pageY;
-});
+var last_scroll_top = 0;
 
 /*!
 * For a contenteditable div, set the cursor to the given index position on the given line number.
@@ -50,6 +43,34 @@ function set_selection( div, line, index ) {
 function pdf_embedded( ) {
     return $('embed[type="application/pdf"]').length > 0;
 }
+
+$(document).ready( function( ) {
+    /*!
+    * Since the contextmenu handler is attached on the background page,
+    * we need to locally store the last right click.
+    */
+    $( window ).contextmenu( function( e ) {
+        last_click_pos.x = e.pageX;
+        last_click_pos.y = e.pageY;
+    });
+
+    /*!
+    * If we are on google docs, implement some special logic so scrolling inside the frame works.
+    */
+    if( window.location.href.indexOf( 'docs.google.' ) != -1 ) {
+        $( '.kix-appview-editor' ).scroll( function(e) { 
+            var scroll_top = $( this ).scrollTop( );
+            var kix_top_offset = $( this ).offset( ).top;
+
+            $( '.note-div-parent' ).each( function() {
+                var new_top_for_div = $( this ).offset( ).top + ( last_scroll_top - scroll_top );
+                $( this ).css( 'top', new_top_for_div );
+            });
+
+            last_scroll_top = scroll_top;
+        });
+    }
+});
 
 chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
     if ( message.function == "context_menu_clicked" ) {
