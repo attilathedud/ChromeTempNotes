@@ -81,6 +81,12 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
         }).appendTo( '#note-parent-' + note_id );
 
         $( '<span/>', {
+            'id' : 'copy-' + note_id,
+            'class' : 'copy-note',
+            'contenteditable' : 'false'
+        }).appendTo( '#note-parent-' + note_id );        
+
+        $( '<span/>', {
             'id' : 'toggle-' + note_id,
             'class' : 'toggle-color-note',
             'contenteditable' : 'false'
@@ -120,6 +126,19 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
 
         $( '#toggle-' + note_id ).on( 'click', function( ) {
             $( this ).parents( '.note-div-parent' ).toggleClass( 'note-div-dark note-div-light' );
+        });
+
+        $( '#copy-' + note_id ).on( 'click', function( ) {
+            var range = document.createRange();
+            range.selectNode( $( this ).parents( '.note-div-parent' ).children( '.note-div')[ 0 ] );
+
+            var selection = window.getSelection( );
+            selection.addRange( range );
+
+            var successful = document.execCommand('copy');  
+            //TODO: give feedback
+
+            selection.removeAllRanges( );
         });
 
         /*!
