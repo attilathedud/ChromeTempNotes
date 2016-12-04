@@ -103,7 +103,7 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
 
         $( '<span/>', {
             'id' : 'copy-' + note_id,
-            'class' : 'copy-note',
+            'class' : 'copy-note not-copied',
             'contenteditable' : 'false'
         }).appendTo( '#note-parent-' + note_id );        
 
@@ -157,7 +157,29 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
             selection.addRange( range );
 
             var successful = document.execCommand('copy');  
-            //TODO: give feedback
+
+            /*!
+            * If we have a successful copy, fadeOut and switch the class descriptor to give feedback.
+            * We have to make use of two classes since ::before attributes are not part of the DOM
+            * and can't be modified through jQuery.
+            */
+            if( successful ) {
+                var $copy_indicator = $( this );
+
+                $copy_indicator.fadeOut( 'fast', function() {
+                    $copy_indicator.toggleClass( 'not-copied copied' );
+                    $copy_indicator.css( 'top', '4px' );
+                    $copy_indicator.show( );
+                    
+                    setTimeout( function() {
+                        $copy_indicator.fadeOut( 'fast', function() {
+                            $copy_indicator.toggleClass( 'not-copied copied' );
+                            $copy_indicator.css( 'top', '3px' );
+                            $copy_indicator.show( );
+                        });
+                    }, 1000 );
+                });
+            }
 
             selection.removeAllRanges( );
         });

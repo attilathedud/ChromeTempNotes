@@ -48,13 +48,17 @@
     cursor: pointer;
 }
 
-.copy-note:before {
+.copy-note {
+    position: absolute;
+    right: 40px;
+    top: 3px;
+    cursor: pointer;
+}
+
+.not-copied:before {
     content: '⎘';
 }
 
-.copy-note {
-    position: absolute;
-    top: 3px;
-    right: 40px;
-    cursor: pointer;
+.copied:before {
+    content: 'Copied ✓';
 }
