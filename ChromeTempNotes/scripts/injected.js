@@ -339,7 +339,17 @@ function append_temp_note_to_page( ) {
 }
 
 chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
-    if ( message.function == "context_menu_clicked" ) {
-        append_temp_note_to_page( );
+    switch( message.function ) {
+        case "context_menu_clicked":
+            append_temp_note_to_page( );
+            break;
+        case "add_note":
+            last_click_pos.x = window.outerWidth / 2;
+            last_click_pos.y = ( window.outerHeight / 2 ) - 50;
+            append_temp_note_to_page( );
+            break;
+        case "clear_notes":
+            $( '.note-div-parent' ).remove( );
+            break;
     }
 });
