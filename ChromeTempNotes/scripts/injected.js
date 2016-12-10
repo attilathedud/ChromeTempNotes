@@ -345,7 +345,7 @@ chrome.extension.onMessage.addListener( function ( message, sender, callback ) {
             break;
         case "add_note":
             last_click_pos.x = window.outerWidth / 2;
-            last_click_pos.y = ( window.outerHeight / 2 ) - 50;
+            last_click_pos.y = ( window.outerHeight + window.scrollY / 2 ) - 50;
             append_temp_note_to_page( );
             break;
         case "clear_notes":
